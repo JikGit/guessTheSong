@@ -6,14 +6,43 @@
 		<link rel="stylesheet" href="./style.css">
 	</head>
 	<body>
+		<div id="topBar">
+			<h1 id="labelSongCounter">
+				CANZONI INDOVINATE: 
+				<span id="songCounter">
+					0
+				</span>
+			</h1>
+
+			<h1 id="labelPossibilita">
+				Hai ancora
+				<span id="possibilita">
+					3
+				</span>
+				Possibilita'
+			</h1>
+		</div>
+
+		<img id="imgAlbum" src="" >
 		<form>
-			<input type="text" id="songNameInput" name="songNameInput" vale="inserisci nome">
+			<input type="text" id="inputForRefresh" name="">
+			<input type="text" id="songNameInput" placeholder="Indovina la canzone" name="songNameInput" value="">
 			<label for="songNameInput"></label>
 		</form>
-		<button id="playBtn">Play Song</button>
-		<video id="videoPlayer" width="320" height="240" controls autoplay>
+		<div id="submitBtn" >Submit</div>
+
+		<div id="playStopBtns">
+			<div id="playBtn">Play</div>
+			<div id="stopBtn">Stop</div>
+		</div>
+		<video id="videoPlayer" controls>
 			<source id="audio" src="" type="audio/mpeg">
 		</video>
+
+		<h1 id="labelPunteggio">
+			Punteggio: 
+			<span id="punteggio">0</span>
+		</h1>
 	</body>
 	<script src="./play.js"></script>
 </html>

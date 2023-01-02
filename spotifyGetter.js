@@ -12,7 +12,7 @@ async function getSavedTracks(spotifyApi){
 	do{
 		tracks = await spotifyApi.getMySavedTracks({limit:limit, offset:startSong});
 		for (let track of tracks.body.items)
-			arr.push({"name":track.track.name, "artist":track.track.artists[0].name, "album":track.track.album.name, "id":track.track.id, "mp3": track.track.preview_url});
+			arr.push({"name":track.track.name, "artist":track.track.artists[0].name, "album":track.track.album.name, "id":track.track.id, "mp3": track.track.preview_url, "imgAlbum": track.track.album.images[0].url});
 		startSong += limit;
 	}while (tracks.body.next != null);
 

@@ -1,12 +1,85 @@
 *{
 	margin:0;
 	box-sizing: border-box;
+	text-align: center;
 }
 
 body{
 	background-color: #191919;
 }
-
-#videoPlayer{
-	display: none;
+#topBar{
+	height: 70px;
+	width: 100%;
+	position: fixed;
+	top: 4%;	
+	font-size: 11px;
+	color:white;
 }
+
+#topBar > #labelSongCounter,
+#topBar > #labelPossibilita{
+	position: absolute;
+	height: 50px;
+	display: inline-block;
+}
+
+#topBar > #labelSongCounter{right: 10%;}
+#topBar > #labelPossibilita{left: 10%;}
+
+#labelPunteggio{
+	width: 200px;
+	height: 50px;
+	top: 80%;
+	color: white;
+}
+
+/* now we have 2 input instead of one, so no refresh on enter */
+#inputForRefresh{display: none;}
+
+/* centro tutti */
+#songNameInput, 
+#submitBtn,
+#playStopBtns,
+#imgAlbum,
+#labelPunteggio{
+	position: absolute;
+	left: 50%;
+	transform: translateX(-50%);
+}
+
+#imgAlbum{
+	height: 400px;
+	width: auto;
+	top: 10%;	
+}
+
+#songNameInput{
+	height: 70px;
+	width: 300px;
+	border: 2px solid white;
+	top: 60%;	
+	font-size: 25px;
+	background-color: white;
+}
+#songNameInput:focus{  outline: none;}
+
+#submitBtn,
+#playBtn,
+#stopBtn{
+	display: inline-block;
+	height: 35px;
+	width: 150px;
+	border-radius: 10px;
+	line-height: 35px;
+	background-color: white;
+	font-size: 25px;
+	transition: width 0.1s;
+}
+
+#submitBtn:hover, #stopBtn:hover, #playBtn:hover{width: 160px; border: 1px solid blue}
+
+#submitBtn{top: 70%;}
+#playStopBtns{top: 50%;}
+
+#videoPlayer{display: none;}
+

@@ -1,10 +1,14 @@
 const mp3Elm = document.getElementById("audio");
 const videoPlayer = document.getElementById("videoPlayer");
 const playBtn = document.getElementById("playBtn");
+const topBarElm = document.getElementById("topBar");
+const waitingElm = document.getElementById("waiting");
 const stopBtn = document.getElementById("stopBtn");
 const enterBtn = document.getElementById("submitBtn");
+const findArtistBtn = document.getElementById("findArtistBtn")
 const imgElm = document.getElementById("imgAlbum");
 const inputElm = document.getElementById("songNameInput");
+const inputArtistElm = document.getElementById("artistNameInput");
 const songCounterElm = document.getElementById("songCounter");
 const possibilitaElm = document.getElementById("possibilita");
 const punteggioElm = document.getElementById("punteggio");
@@ -14,8 +18,11 @@ let endSecond = 0;
 let punteggio = 0;
 
 let songName;
+let artist;
 let startPossibilita = 3;
 possibilitaElm.innerHTML = startPossibilita;
+
+let alreadyPlayed = [];
 
 function generateRandomSong(){
 	fetch('./songsData.json')
@@ -25,9 +32,12 @@ function generateRandomSong(){
 			let randomN;
 			do{
 				randomN = Math.floor(Math.random() * songsDataJson.length)
-				song = songsDataJson[randomN].mp3;
-			}while (song == null)
-			songName = songsDataJson[randomN].name;
+				songName = songsDataJson[randomN].name;
+			}while (alreadyPlayed.includes(songName))
+			song = songsDataJson[randomN].mp3;
+		console.log(songsDataJson.length)
+		console.log(songName)
+			alreadyPlayed.push(songName)
 			imgAlbum.src = songsDataJson[randomN].imgAlbum;
 			mp3Elm.src = song;
 			videoPlayer.load();
@@ -37,15 +47,15 @@ function generateRandomSong(){
 //spazi vuoti nel testo non contano, non case sensitive, feat non conta
 submitBtn.addEventListener("click", () => {
 	stopBtn.click();
+
 	let triedSong = inputElm.value;
 	inputElm.value = "";
 	if (triedSong == "")
 		return;
 
-	if (songName.includes("("))
-		songName = songName.split("(")[0]
-	songName = songName.replace(/ /g, "").toLowerCase()
-	triedSong = triedSong.replace(/ /g, "").toLowerCase()
+	songName = songName.split("(")[0].split("[")[0].split("-")[0];
+	songName = songName.replace(/ /g, "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+	triedSong = triedSong.replace(/ /g, "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 	//azzeccata
 	if (triedSong == songName){
 		inputElm.placeholder = "Indovina la canzone";
@@ -81,18 +91,30 @@ function calculatePunteggio(indovinata){
 
 	startSecond = 0;
 	endSecond = 0;
-
-
 }
 
 playBtn.addEventListener("click", () => {
 	startSecond = new Date().getTime()/1000;
-	videoPlayer.play();}
-)
+	videoPlayer.play();
+})
 stopBtn.addEventListener("click", () => {
 	endSecond = new Date().getTime()/1000;
-	videoPlayer.pause();}
-)
+	videoPlayer.pause();
+})
+
+findArtistBtn.addEventListener("click", async () => {
+	topBarElm.classList.remove("visible");
+	waiting.classList.add("visible");
+	
+	let artistName = inputArtistElm.value;
+	let response = await fetch("/get?artistName="+artistName);
+	let message = await response.json();
+	artist = message.message;
+
+	topBarElm.classList.add("visible");
+	waiting.classList.remove("visible");
+	window.location.reload();
+})
 
 generateRandomSong()
 

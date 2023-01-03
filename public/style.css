@@ -7,6 +7,7 @@
 body{
 	background-color: #191919;
 }
+
 #topBar{
 	height: 70px;
 	width: 100%;
@@ -14,6 +15,10 @@ body{
 	top: 4%;	
 	font-size: 11px;
 	color:white;
+}
+
+#topBar:not(.visible){
+	display: none;
 }
 
 #topBar > #labelSongCounter,
@@ -33,8 +38,6 @@ body{
 	color: white;
 }
 
-/* now we have 2 input instead of one, so no refresh on enter */
-#inputForRefresh{display: none;}
 
 /* centro tutti */
 #songNameInput, 
@@ -42,15 +45,18 @@ body{
 #playStopBtns,
 #imgAlbum,
 #labelPunteggio{
-	position: absolute;
-	left: 50%;
-	transform: translateX(-50%);
+	/* position: absolute; */
+	/* left: 50%; */
+	/* transform: translateX(-50%); */
+	margin: auto;
+	margin-top: 10px;
 }
 
 #imgAlbum{
 	height: 400px;
 	width: auto;
 	top: 10%;	
+	margin-top: 70px;
 }
 
 #songNameInput{
@@ -63,6 +69,7 @@ body{
 }
 #songNameInput:focus{  outline: none;}
 
+#findArtistBtn,
 #submitBtn,
 #playBtn,
 #stopBtn{

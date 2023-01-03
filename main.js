@@ -2,7 +2,7 @@ import express from 'express';
 import {readFile} from 'fs/promises';
 import {writeFile} from 'fs/promises';
 import spotifyWebApi from 'spotify-web-api-node';
-import {getId, getSavedTracks} from './spotifyGetter.js'
+import {getId, getArtistName, getSavedTracks, getSongsByArtisName} from './spotifyGetter.js'
 
 const userData = await readFile("./userData.json", "utf8");
 const userDataJson = JSON.parse(userData);
@@ -43,6 +43,15 @@ app.get('/', (request, response) => {
 	return response.redirect(spotifyApi.createAuthorizeURL(scopes));	
 })
 
+app.get('/get', async (request, response) => {
+	spotifyApi.setAccessToken(userDataJson.accessToken);
+	let artistName = request.query.artistName;
+	let realArtistName = await getArtistName(spotifyApi, artistName)
+
+	await getSongsByArtisName(spotifyApi, realArtistName).then(async data => {await writeFile("./public/songsData.json", JSON.stringify(data), 'utf8')})
+	return response.send(JSON.stringify({message:realArtistName}))
+})
+
 app.get('/play', async (request, response) => {
 	response.send(await readFile("./public/play.html", "utf8"))
 })
@@ -67,13 +76,12 @@ app.get('/callback', async (req, res) => {
 			userDataJson["refreshToken"] = refreshToken;
 			
 			//write to json
-			async () => {await writeFile('./userData.json', JSON.stringify(userDataJson), 'utf8');}
+			writeFile('./userData.json', JSON.stringify(userDataJson), 'utf8');
 
 			//reload the token in the spotifyApi obj
 			spotifyApi.setAccessToken(accessToken);
 			spotifyApi.setRefreshToken(refreshToken);
-
-			getSavedTracks(spotifyApi).then(async data => {await writeFile("./public/songsData.json", JSON.stringify(data), 'utf8')});
+			// async () => {await getSavedTracks(spotifyApi).then(async data => {await writeFile("./public/songsData.json", JSON.stringify(data), 'utf8')});}
 
 			//se passa troppo tempo refresho il token
 			setInterval(async () => {
@@ -86,12 +94,12 @@ app.get('/callback', async (req, res) => {
 				spotifyApi.setAccessToken(accessToken);
 			}, expires_in / 2 * 1000);
 
-			return res.redirect("./play")
 		})
 		.catch(error => {
 			console.error('Error getting Tokens:', error);
 			return res.send(`Error getting Tokens: ${error}`);
 		});
+		return res.redirect("./play")
 })
 
 app.listen(3000, () =>{console.log("app running")});

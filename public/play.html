@@ -5,6 +5,7 @@
 		<title></title>
 		<link rel="stylesheet" href="./style.css">
 		<link rel="stylesheet" href="./waiting.css">
+		<script src="https://kit.fontawesome.com/99e48f3be3.js" crossorigin="anonymous"></script>
 	</head>
 	<body>
 		<!-- waiting thing -->
@@ -21,43 +22,49 @@
 			<div class="wave"></div>
 		</div>
 		<div id="topBar" class="visible">
-			<h1 id="labelSongCounter">
-				CANZONI INDOVINATE: 
+			<div id="containerArtistInput">
+				<input name="artistNameInput" type="text" id="artistNameInput" placeholder="Inserisci l'artista" name="songNameInput" value="">
+				<div id="findArtistBtn" >
+					<i class="fa-solid fa-magnifying-glass"></i>
+				</div>
+			</div>
+			
+			<div id="labelSongCounter">
+				Canzoni indovinate: 
 				<span id="songCounter">
 					0
 				</span>
-			</h1>
+			</div>
 
-			<h1 id="labelPossibilita">
+			<div id="labelPossibilita">
 				Hai ancora
 				<span id="possibilita">
 					3
 				</span>
 				Possibilita'
-			</h1>
+			</div>
 		</div>
 
 		<img id="imgAlbum" src="" >
-		<form>
-			<input type="text" id="songNameInput" placeholder="Indovina la canzone" name="songNameInput" value="">
-			<label for="songNameInput"></label>
-			<input type="text" id="artistNameInput" placeholder="Seleziona l'artista" name="songNameInput" value="">
-		</form>
-		<div id="submitBtn" >Submit</div>
-		<div id="findArtistBtn" >Cerca Autore</div>
-
-		<div id="playStopBtns">
-			<div id="playBtn">Play</div>
-			<div id="stopBtn">Stop</div>
+		<div id="containerSong">
+			<input type="text" id="songNameInput" placeholder="Scrivi il titolo" name="songNameInput" value="">
+			<div id="submitBtn">
+				<i class="fa-solid fa-check"></i>
+			</div>
+			<div id="surrendBtn">
+				<i class="fa-regular fa-circle-xmark"></i>
+			</div>
 		</div>
+
 		<video id="videoPlayer" controls>
 			<source id="audio" src="" type="audio/mpeg">
 		</video>
 
-		<h1 id="labelPunteggio">
+		<div id="labelPunteggio">
 			Punteggio: 
 			<span id="punteggio">0</span>
-		</h1>
+		</div>
+
 	</body>
 	<script src="./play.js"></script>
 </html>

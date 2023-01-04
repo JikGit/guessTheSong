@@ -1,8 +1,7 @@
-import express from 'express';
-import {readFile} from 'fs/promises';
+import express from 'express'; import {readFile} from 'fs/promises';
 import {writeFile} from 'fs/promises';
 import spotifyWebApi from 'spotify-web-api-node';
-import {getId, getArtistName, getSavedTracks, getSongsByArtisName} from './spotifyGetter.js'
+import {getId, getArtistName, getSavedTracks, getSongsByArtistName, getRandomSongByAristName} from './spotifyGetter.js'
 
 const userData = await readFile("./userData.json", "utf8");
 const userDataJson = JSON.parse(userData);
@@ -43,13 +42,45 @@ app.get('/', (request, response) => {
 	return response.redirect(spotifyApi.createAuthorizeURL(scopes));	
 })
 
-app.get('/get', async (request, response) => {
-	spotifyApi.setAccessToken(userDataJson.accessToken);
+app.get('/saveArtist', async (request, response) => {
 	let artistName = request.query.artistName;
-	let realArtistName = await getArtistName(spotifyApi, artistName)
+	if (artistName){
+		spotifyApi.setAccessToken(userDataJson.accessToken);
+		let realArtistName = await getArtistName(spotifyApi, artistName);
+		await writeFile("./public/artist.json", JSON.stringify({artist: realArtistName}), 'utf8')
+		return response.sendStatus(200);
+	}
+})
 
-	await getSongsByArtisName(spotifyApi, realArtistName).then(async data => {await writeFile("./public/songsData.json", JSON.stringify(data), 'utf8')})
-	return response.send(JSON.stringify({message:realArtistName}))
+app.get('/getArtistName', async (request, response) => {
+	let artistName = request.query.artistName;
+	if (artistName){
+		spotifyApi.setAccessToken(userDataJson.accessToken);
+		let realArtistName = await getArtistName(spotifyApi, artistName);
+		return response.send(JSON.stringify({message:realArtistName}))
+	}
+})
+
+app.get('/getSongs', async (request, response) => {
+	let artistName = request.query.artistName;
+	if (artistName){
+		spotifyApi.setAccessToken(userDataJson.accessToken);
+		let realArtistName = await getArtistName(spotifyApi, artistName);
+		let songsObj = getSongsByArtistName(spotifyApi, realArtistName.message)
+			// .then(async data => {await writeFile("./public/songsData.json", JSON.stringify(data), 'utf8')})
+		return response.send(JSON.stringify({message:songsObj}))
+	}
+
+})
+
+app.get('/getRandomSong', async (request, response) => {
+	let artistName = request.query.artistName;
+	if (artistName){
+		spotifyApi.setAccessToken(userDataJson.accessToken);
+		let realArtistName = await getArtistName(spotifyApi, artistName);
+		let songObj = await getRandomSongByAristName(spotifyApi, realArtistName);
+		return response.send(JSON.stringify({message:songObj}))
+	}
 })
 
 app.get('/play', async (request, response) => {
@@ -76,7 +107,7 @@ app.get('/callback', async (req, res) => {
 			userDataJson["refreshToken"] = refreshToken;
 			
 			//write to json
-			writeFile('./userData.json', JSON.stringify(userDataJson), 'utf8');
+			async() => {writeFile('./userData.json', JSON.stringify(userDataJson), 'utf8')};
 
 			//reload the token in the spotifyApi obj
 			spotifyApi.setAccessToken(accessToken);

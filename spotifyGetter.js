@@ -25,7 +25,8 @@ async function getSavedTracks(spotifyApi){
 	return arr;
 }
 
-async function getSongsByArtisName(spotifyApi, artist){
+
+async function getSongsByArtistName(spotifyApi, artist){
 	let tracks = [];
 	let artistsObj = await spotifyApi.searchArtists(artist)	
 
@@ -34,22 +35,22 @@ async function getSongsByArtisName(spotifyApi, artist){
 
 	let nSong = 0;
 	let maxSong = 50;
+
 	for (let albumObj of data.body.items){
 		let songs = await getAlbumTracks(spotifyApi, albumObj.id, artist);
 		for (let songObj of songs){
 			songObj.album = albumObj.name;
 			songObj.imgAlbum = albumObj.images[0].url;
 			tracks.push(songObj);
-
-			if (++nSong == maxSong){
-				console.log("finished fetching data")
-				return tracks;	
-			}
+			nSong++;
 		}
+		if (++nSong >= maxSong)
+			break;
 	}
 	console.log("finished fetching data")
 	return tracks;	
 }
+
 
 async function getAlbumTracks(spotifyApi, id, artist){
 	let album = await spotifyApi.getAlbumTracks(id)
@@ -66,4 +67,39 @@ async function getAlbumTracks(spotifyApi, id, artist){
 	return tracks;
 }
 
-export {getId, getArtistName, getSavedTracks, getSongsByArtisName};
+async function getRandomAlbumTrack(spotifyApi, id, artist){
+	let album = await spotifyApi.getAlbumTracks(id)
+	let track;
+	do{
+		let randomN = Math.floor(Math.random() * (album.body.items.length-1));
+		track = album.body.items[randomN];
+		if (track.preview_url == null){
+			let data = await spotifyApi.searchTracks("track: " + track.name + " artist: " + artist);
+			track = data.body.tracks.items[0];
+		}
+		//se c'e' nel feat va bene lo stesso
+		if (track.artists.length > 1){
+			if (track.artists[1].name.toLowerCase() == artist.toLowerCase())
+				break;
+		}
+	}while (track.artists[0].name.toLowerCase() != artist.toLowerCase());
+
+	return {"name":track.name, "artist":track.artists[0].name, "id":track.id, "mp3": track.preview_url};
+}
+
+async function getRandomSongByAristName(spotifyApi, artist){
+	let artistsObj = await spotifyApi.searchArtists(artist)	
+	let albumsObj = await spotifyApi.getArtistAlbums(artistsObj.body.artists.items[0].id, {limit: 10, offset: 0});
+
+	let randomN = Math.floor(Math.random() * (albumsObj.body.items.length-1));
+	let randomAlbum = albumsObj.body.items[randomN];
+
+	let songObj = await getRandomAlbumTrack(spotifyApi, randomAlbum.id, artist);
+	songObj.album = randomAlbum.name;
+	songObj.imgAlbum = randomAlbum.images[0].url;
+
+	return songObj;
+}
+
+
+export {getId, getArtistName, getSavedTracks, getSongsByArtistName, getRandomSongByAristName};

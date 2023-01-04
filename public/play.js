@@ -1,13 +1,12 @@
 const mp3Elm = document.getElementById("audio");
 const videoPlayer = document.getElementById("videoPlayer");
-const playBtn = document.getElementById("playBtn");
 const topBarElm = document.getElementById("topBar");
 const waitingElm = document.getElementById("waiting");
-const stopBtn = document.getElementById("stopBtn");
-const enterBtn = document.getElementById("submitBtn");
+const submitBtn = document.getElementById("submitBtn");
+const surrendBtn = document.getElementById("surrendBtn");
 const findArtistBtn = document.getElementById("findArtistBtn")
 const imgElm = document.getElementById("imgAlbum");
-const inputElm = document.getElementById("songNameInput");
+const inputSongElm = document.getElementById("songNameInput");
 const inputArtistElm = document.getElementById("artistNameInput");
 const songCounterElm = document.getElementById("songCounter");
 const possibilitaElm = document.getElementById("possibilita");
@@ -18,71 +17,103 @@ let endSecond = 0;
 let punteggio = 0;
 
 let songName;
-let artist;
+let artistName = "";
 let startPossibilita = 3;
 possibilitaElm.innerHTML = startPossibilita;
 
 let alreadyPlayed = [];
 
-function generateRandomSong(){
-	fetch('./songsData.json')
-		.then((response) => response.json())
-		.then((songsDataJson) => {
-			let song;
-			let randomN;
-			do{
-				randomN = Math.floor(Math.random() * songsDataJson.length)
-				songName = songsDataJson[randomN].name;
-			}while (alreadyPlayed.includes(songName))
-			song = songsDataJson[randomN].mp3;
-		console.log(songsDataJson.length)
-		console.log(songName)
-			alreadyPlayed.push(songName)
-			imgAlbum.src = songsDataJson[randomN].imgAlbum;
-			mp3Elm.src = song;
-			videoPlayer.load();
-		})
+async function generateRandomSong(){
+	startWaiting();
+	//niente canzoni uguali
+	let songObj;
+	do{
+		response = await fetch("/getRandomSong?artistName="+artistName);
+		songObj = await response.json();
+		songObj = songObj.message;
+		songName = songObj.name;
+	}while (alreadyPlayed.includes(songName))
+
+	console.log(songName)
+	setGuessSong(songName, songObj.imgAlbum, songObj.mp3);
+
+	endWaiting();
+	playMusic(videoPlayer);
+	setStartSecond();
+}
+
+//previusEndSecond e' il tempo dove la canzone si e' fermata prima
+function setStartSecond(previusEndSecond = 0){
+	if (previusEndSecond)
+		startSecond = new Date().getTime()/1000 - (previusEndSecond - startSecond);
+	else
+		startSecond = new Date().getTime()/1000
+}
+
+function setEndSecond(){
+	endSecond = new Date().getTime()/1000;
+}
+
+function setGuessSong(songName, imgAlbum, songMp3){
+	alreadyPlayed.push(songName);
+	imgElm.src = imgAlbum;
+	mp3Elm.src = songMp3;
+	videoPlayer.load();
+}
+
+surrendBtn.addEventListener("click", () => {
+	wrongSong(true);
+})
+
+function wrongSong(skip = false){
+	inputSongElm.placeholder = "Canzone errata";
+	possibilitaElm.innerHTML--;
+	//se fine possibilita' cambio canzone
+	if (possibilitaElm.innerHTML == 0 || skip){
+		possibilitaElm.innerHTML = startPossibilita;
+		calculatePunteggio(false);
+		generateRandomSong();
+		return;
+	}
+	playMusic(videoPlayer);
+	setStartSecond(endSecond);
+}
+
+function nextSong(){
+	inputSongElm.placeholder = "Indovina la canzone";
+	songCounterElm.innerHTML++;
+	possibilitaElm.innerHTML = startPossibilita;
+	calculatePunteggio(true);
+	generateRandomSong();
 }
 
 //spazi vuoti nel testo non contano, non case sensitive, feat non conta
 submitBtn.addEventListener("click", () => {
-	stopBtn.click();
-
-	let triedSong = inputElm.value;
-	inputElm.value = "";
+	let triedSong = inputSongElm.value;
+	inputSongElm.value = "";
 	if (triedSong == "")
 		return;
 
-	songName = songName.split("(")[0].split("[")[0].split("-")[0];
-	songName = songName.replace(/ /g, "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-	triedSong = triedSong.replace(/ /g, "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+	songName = 	songName.split("(")[0].split("[")[0].split("-")[0].replace("'", "").replace(/ /g, "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+	triedSong = triedSong.replace(/ /g, "").replace("'", "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 	//azzeccata
-	if (triedSong == songName){
-		inputElm.placeholder = "Indovina la canzone";
-		songCounterElm.innerHTML++;
-		calculatePunteggio(true);
-		generateRandomSong();
+	if (triedSong == songName)
+		nextSong();
 	//non azzeccata
-	}else{
-		inputElm.placeholder = "Canzone errata";
-		possibilitaElm.innerHTML--;
-		if (possibilitaElm.innerHTML == 0){
-			possibilitaElm.innerHTML = startPossibilita;
-			calculatePunteggio(false);
-			generateRandomSong();
-		}
-	}
+	else
+		wrongSong();
 })
 
 function calculatePunteggio(indovinata){
 	if (indovinata){
 		//se non fai partire la canzone
-		if (startSecond == 0)
-			punteggio += (25 * 30)
-		else
-			punteggio += Math.floor((25 - (endSecond - startSecond)) * 10)
-	}else
-		punteggio -= Math.floor((endSecond - startSecond)*3)
+		punteggio += Math.floor((25 - (endSecond - startSecond)) * 10)
+	}else{
+		if (endSecond != 0)
+			punteggio -= Math.floor((endSecond - startSecond)*3)
+		else 
+			punteggio -= 50;
+	}
 
 	//inserisco il punteggio
 	if (punteggio < 0)
@@ -93,28 +124,63 @@ function calculatePunteggio(indovinata){
 	endSecond = 0;
 }
 
-playBtn.addEventListener("click", () => {
-	startSecond = new Date().getTime()/1000;
-	videoPlayer.play();
-})
-stopBtn.addEventListener("click", () => {
-	endSecond = new Date().getTime()/1000;
+//start the audio
+function playMusic(musicPlayer){
+	var promise = musicPlayer.play();
+	if (promise !== undefined) {
+		promise.then(_ => {}).catch(error => {});
+	}
+}
+
+
+inputSongElm.addEventListener("keypress", (e) => {
+	setEndSecond();
 	videoPlayer.pause();
+	if (e.key == "Enter")
+		submitBtn.click();
 })
 
-findArtistBtn.addEventListener("click", async () => {
+inputArtistElm.addEventListener("keypress", (e) => {
+	if (e.key == "Enter")
+		findArtistBtn.click();
+})
+
+function startWaiting(){
 	topBarElm.classList.remove("visible");
 	waiting.classList.add("visible");
-	
-	let artistName = inputArtistElm.value;
-	let response = await fetch("/get?artistName="+artistName);
-	let message = await response.json();
-	artist = message.message;
+}
 
+function endWaiting(){
 	topBarElm.classList.add("visible");
 	waiting.classList.remove("visible");
-	window.location.reload();
+}
+
+findArtistBtn.addEventListener("click", async () => {
+	startWaiting();	
+	artistName = inputArtistElm.value;
+	let response = await fetch("/getArtistName?artistName="+artistName);
+	let message = await response.json();
+	artistName = message.message;
+	
+	response = await fetch("/saveArtist?artistName="+artistName);
+
+	inputArtistElm.value = artistName;
+
+	await generateRandomSong();
 })
 
-generateRandomSong()
 
+//run at the start to check for previus artist
+async function checkForArtist(){
+	if (!artistName){
+		let response = await fetch("./artist.json")
+		let artistNameObj = await response.json();
+		if (artistNameObj.artist == null)
+			return;
+		artistName = artistNameObj.artist;
+		console.log(artistName)
+		generateRandomSong();
+	}
+}
+
+window.onload = checkForArtist();

@@ -8,6 +8,7 @@
 	align-items: center;
 	background: #000;
 	opacity: 95%;
+	z-index: 2;
 }
 
 #waiting > .wave {

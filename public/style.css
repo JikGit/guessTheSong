@@ -8,13 +8,36 @@ body{
 	background-color: #191919;
 }
 
+/* sfondo bianco */
+#songNameInput,
+#findArtistBtn{
+	background-color: white;
+}
+
+/* centro tutti */
+#containerSong,
+#imgAlbum,
+#labelPunteggio{
+	margin: auto;
+	margin-top: 10px;
+}
+
+/* bold */
+#topBar > #labelSongCounter > span,
+#topBar > #labelPossibilita > span,
+#labelPunteggio > span{
+	font-weight: bold;
+}
+
+/* TOPBAR */
 #topBar{
-	height: 70px;
+	height: 100px;
 	width: 100%;
 	position: fixed;
 	top: 4%;	
-	font-size: 11px;
+	font-size: 25px;
 	color:white;
+	text-align: left;
 }
 
 #topBar:not(.visible){
@@ -26,67 +49,116 @@ body{
 	position: absolute;
 	height: 50px;
 	display: inline-block;
+	right: 7%;
+	font-weight: normal;
 }
 
-#topBar > #labelSongCounter{right: 10%;}
-#topBar > #labelPossibilita{left: 10%;}
+#topBar > #labelSongCounter{top: 5%}
+#topBar > #labelPossibilita{top: 50%}
 
 #labelPunteggio{
-	width: 200px;
+	font-size: 40px;
+	width: 400px;
 	height: 50px;
-	top: 80%;
 	color: white;
+	margin-top: 50px;
 }
 
-
-/* centro tutti */
-#songNameInput, 
-#submitBtn,
-#playStopBtns,
-#imgAlbum,
-#labelPunteggio{
-	/* position: absolute; */
-	/* left: 50%; */
-	/* transform: translateX(-50%); */
-	margin: auto;
-	margin-top: 10px;
-}
-
+/* COVER ALBUM */
 #imgAlbum{
 	height: 400px;
 	width: auto;
-	top: 10%;	
-	margin-top: 70px;
+	margin-top: 200px;
+}
+
+/* PULSANTI/INPUT */
+#containerSong{
+	position: relative;
+	height: 70px;	
+	width: 400px;
+	z-index: 0;
 }
 
 #songNameInput{
-	height: 70px;
-	width: 300px;
-	border: 2px solid white;
-	top: 60%;	
+	height: 100%;
+	width: 70%;
+	border: none;
 	font-size: 25px;
-	background-color: white;
+	position: absolute;
+	left: 0;
 }
-#songNameInput:focus{  outline: none;}
 
-#findArtistBtn,
-#submitBtn,
-#playBtn,
-#stopBtn{
-	display: inline-block;
-	height: 35px;
-	width: 150px;
+#songNameInput:focus,
+#artistNameInput:focus{
+	outline: solid 2px blue;
+}
+
+#submitBtn, 
+#surrendBtn{
+	height: 70%;
+	width: 50px; 
+	border-radius: 30px;
+	position: absolute;
+	top: 50%;
+	transform: translateY(-50%);
+	transition: border 1s;
+}
+
+#submitBtn{right: 15%}
+#surrendBtn{right: 0}
+
+#surrendBtn> i {color: red}
+#submitBtn> i {color: green}
+
+#surrendBtn> i,
+#submitBtn > i{
+	width: 30px;
+	height: 30px;
+	position: absolute;
+	right: 50%;
+	bottom: 50%;
+	font-size: 30px;
+	transform: translate(50%, 50%);
+	transition: color 0.5s;
+}
+
+#containerArtistInput{
+	height: 80px;
+	width: 250;
+	position: absolute;
+	left: 10%;
+	top: 50%;
+	transform: translateY(-50%);
+}
+
+#artistNameInput{
+	width: 200px;
+	height: 40px;
+	border: none;
 	border-radius: 10px;
-	line-height: 35px;
-	background-color: white;
-	font-size: 25px;
-	transition: width 0.1s;
 }
 
-#submitBtn:hover, #stopBtn:hover, #playBtn:hover{width: 160px; border: 1px solid blue}
+#findArtistBtn{
+	height: 40px;
+	width: 40px;
+	border-radius: 50%;
+	line-height: 40px;
+	color: black;
+	transition: width 0.1s;
+	display: inline-block;
+}
 
-#submitBtn{top: 70%;}
-#playStopBtns{top: 50%;}
+#findArtistBtn > i{
+	font-size: 23px;
+	color: green;
+	transition: color 0.5s;
+	margin: auto;
+	position: relative;
+	top: 3px;
+}
+
+#submitBtn>i:hover,
+#findArtistBtn>i:hover{color: blue}
 
 #videoPlayer{display: none;}
 

@@ -42,16 +42,6 @@ app.get('/', (request, response) => {
 	return response.redirect(spotifyApi.createAuthorizeURL(scopes));	
 })
 
-app.get('/saveArtist', async (request, response) => {
-	let artistName = request.query.artistName;
-	if (artistName){
-		spotifyApi.setAccessToken(userDataJson.accessToken);
-		let realArtistName = await getArtistName(spotifyApi, artistName);
-		await writeFile("./public/artist.json", JSON.stringify({artist: realArtistName}), 'utf8')
-		return response.sendStatus(200);
-	}
-})
-
 app.get('/getArtistName', async (request, response) => {
 	let artistName = request.query.artistName;
 	if (artistName){
@@ -107,7 +97,7 @@ app.get('/callback', async (req, res) => {
 			userDataJson["refreshToken"] = refreshToken;
 			
 			//write to json
-			async() => {writeFile('./userData.json', JSON.stringify(userDataJson), 'utf8')};
+			async() => {await writeFile('./userData.json', JSON.stringify(userDataJson), 'utf8')};
 
 			//reload the token in the spotifyApi obj
 			spotifyApi.setAccessToken(accessToken);

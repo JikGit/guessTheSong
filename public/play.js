@@ -7,10 +7,12 @@ const surrendBtn = document.getElementById("surrendBtn");
 const findArtistBtn = document.getElementById("findArtistBtn")
 const imgElm = document.getElementById("imgAlbum");
 const inputSongElm = document.getElementById("songNameInput");
-const inputArtistElm = document.getElementById("artistNameInput");
+const artistNameInputElm = document.getElementById("artistNameInput");
+const containerArtistInputElm = document.getElementById("containerArtistInput");
 const songCounterElm = document.getElementById("songCounter");
 const possibilitaElm = document.getElementById("possibilita");
 const punteggioElm = document.getElementById("punteggio");
+const sceltaSbagliataElm = document.getElementById("sceltaSbagliata");
 
 let startSecond = 0;
 let endSecond = 0;
@@ -40,6 +42,9 @@ async function generateRandomSong(){
 	endWaiting();
 	playMusic(videoPlayer);
 	setStartSecond();
+	inputSongElm.value = "";
+
+	sceltaSbagliataElm.classList.remove("visible");
 }
 
 //previusEndSecond e' il tempo dove la canzone si e' fermata prima
@@ -77,6 +82,8 @@ function wrongSong(skip = false){
 	}
 	playMusic(videoPlayer);
 	setStartSecond(endSecond);
+	sceltaSbagliataElm.classList.remove("visible");
+	sceltaSbagliataElm.classList.add("visible");
 }
 
 function nextSong(){
@@ -90,11 +97,10 @@ function nextSong(){
 //spazi vuoti nel testo non contano, non case sensitive, feat non conta
 submitBtn.addEventListener("click", () => {
 	let triedSong = inputSongElm.value;
-	inputSongElm.value = "";
 	if (triedSong == "")
 		return;
 
-	songName = 	songName.split("(")[0].split("[")[0].split("-")[0].replace("'", "").replace(/ /g, "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+	songName = 	songName.split("(")[0].split("[")[0].split("-")[0].replace("?", "").replace("'", "").replace(/ /g, "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 	triedSong = triedSong.replace(/ /g, "").replace("'", "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 	//azzeccata
 	if (triedSong == songName)
@@ -140,47 +146,34 @@ inputSongElm.addEventListener("keypress", (e) => {
 		submitBtn.click();
 })
 
-inputArtistElm.addEventListener("keypress", (e) => {
+artistNameInputElm.addEventListener("keypress", (e) => {
 	if (e.key == "Enter")
 		findArtistBtn.click();
 })
 
 function startWaiting(){
 	topBarElm.classList.remove("visible");
+	containerArtistInputElm.classList.add("waiting");
 	waiting.classList.add("visible");
 }
 
 function endWaiting(){
 	topBarElm.classList.add("visible");
+	containerArtistInputElm.classList.remove("waiting");
 	waiting.classList.remove("visible");
 }
 
 findArtistBtn.addEventListener("click", async () => {
 	startWaiting();	
-	artistName = inputArtistElm.value;
+	artistName = artistNameInputElm.value;
 	let response = await fetch("/getArtistName?artistName="+artistName);
 	let message = await response.json();
 	artistName = message.message;
 	
-	response = await fetch("/saveArtist?artistName="+artistName);
-
-	inputArtistElm.value = artistName;
+	artistNameInputElm.value = artistName;
 
 	await generateRandomSong();
 })
 
-
-//run at the start to check for previus artist
-async function checkForArtist(){
-	if (!artistName){
-		let response = await fetch("./artist.json")
-		let artistNameObj = await response.json();
-		if (artistNameObj.artist == null)
-			return;
-		artistName = artistNameObj.artist;
-		console.log(artistName)
-		generateRandomSong();
-	}
-}
-
-window.onload = checkForArtist();
+//aspetto che inserisca un autore
+window.onload = startWaiting();

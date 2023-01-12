@@ -8,13 +8,8 @@ body{
 	background-color: #191919;
 }
 
-/* sfondo bianco */
-#songNameInput,
-#findArtistBtn{
-	background-color: white;
-}
-
 /* centro tutti */
+#playBtn,
 #containerSong,
 #imgAlbum,
 #labelPunteggio{
@@ -117,24 +112,6 @@ body{
 	transform: translate(-50%, -50%);
 }
 
-/* SCELTA SBAGLIATA/CORRETTA */
-
-#sceltaSbagliata{
-	font-size: 25px;	
-	color: white;
-	color: red;
-	transition: opacity 0.5s ease;
-}
-
-#sceltaSbagliata:not(.visible){
-	display: none;
-}
-
-#sceltaSbagliata.visible{
-	animation: disappearText 1s 1;
-	animation-fill-mode: forwards;
-}
-
 /* COVER ALBUM */
 #imgAlbum{
 	height: 400px;
@@ -144,6 +121,13 @@ body{
 }
 
 /* PULSANTI/INPUT */
+#playBtn{
+	height: 70%;
+	width: 50px; 
+	color: #5000dd;
+	font-size: 30px;
+}
+
 #containerSong{
 	position: relative;
 	height: 70px;	
@@ -157,6 +141,7 @@ body{
 	border: none;
 	font-size: 25px;
 	position: absolute;
+	background-color: white;
 	left: 0;
 }
 
@@ -179,9 +164,6 @@ body{
 #submitBtn{right: 15%}
 #surrendBtn{right: 0}
 
-#surrendBtn> i {color: red}
-#submitBtn> i {color: green}
-
 #surrendBtn> i,
 #submitBtn > i{
 	width: 30px;
@@ -194,9 +176,8 @@ body{
 	transition: color 0.5s ease;
 }
 
-
-#submitBtn>i:hover,
-#findArtistBtn>i:hover{color: blue}
+#surrendBtn> i {color: red}
+#submitBtn> i {color: green}
 
 #videoPlayer{display: none;}
 

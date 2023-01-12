@@ -6,13 +6,13 @@ const submitBtn = document.getElementById("submitBtn");
 const surrendBtn = document.getElementById("surrendBtn");
 const findArtistBtn = document.getElementById("findArtistBtn")
 const imgElm = document.getElementById("imgAlbum");
+const playBtnElm = document.getElementById("playBtn");
 const inputSongElm = document.getElementById("songNameInput");
 const artistNameInputElm = document.getElementById("artistNameInput");
 const containerArtistInputElm = document.getElementById("containerArtistInput");
 const songCounterElm = document.getElementById("songCounter");
 const possibilitaElm = document.getElementById("possibilita");
 const punteggioElm = document.getElementById("punteggio");
-const sceltaSbagliataElm = document.getElementById("sceltaSbagliata");
 
 let startSecond = 0;
 let endSecond = 0;
@@ -44,7 +44,6 @@ async function generateRandomSong(){
 	setStartSecond();
 	inputSongElm.value = "";
 
-	sceltaSbagliataElm.classList.remove("visible");
 }
 
 //previusEndSecond e' il tempo dove la canzone si e' fermata prima
@@ -71,6 +70,7 @@ surrendBtn.addEventListener("click", () => {
 })
 
 function wrongSong(skip = false){
+	videoPlayer.pause();
 	inputSongElm.placeholder = "Canzone errata";
 	possibilitaElm.innerHTML--;
 	//se fine possibilita' cambio canzone
@@ -82,8 +82,6 @@ function wrongSong(skip = false){
 	}
 	playMusic(videoPlayer);
 	setStartSecond(endSecond);
-	sceltaSbagliataElm.classList.remove("visible");
-	sceltaSbagliataElm.classList.add("visible");
 }
 
 function nextSong(){
@@ -138,7 +136,6 @@ function playMusic(musicPlayer){
 	}
 }
 
-
 inputSongElm.addEventListener("keypress", (e) => {
 	setEndSecond();
 	videoPlayer.pause();
@@ -174,6 +171,9 @@ findArtistBtn.addEventListener("click", async () => {
 
 	await generateRandomSong();
 })
+
+
+playBtnElm.addEventListener("click", () => {playMusic(videoPlayer)});
 
 //aspetto che inserisca un autore
 window.onload = startWaiting();

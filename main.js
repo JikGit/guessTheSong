@@ -74,6 +74,17 @@ app.get('/getRandomSong', async (request, response) => {
 })
 
 app.get('/play', async (request, response) => {
+	//refresho il token
+	async () => {
+		const data = await spotifyApi.refreshAccessToken();
+		accessToken = data.body['access_token'];
+
+		console.log('The access token has been refreshed!');
+		console.log('access_token:', accessToken);
+
+		spotifyApi.setAccessToken(accessToken);
+	};
+
 	response.send(await readFile("./public/play.html", "utf8"))
 })
 
@@ -102,19 +113,6 @@ app.get('/callback', async (req, res) => {
 			//reload the token in the spotifyApi obj
 			spotifyApi.setAccessToken(accessToken);
 			spotifyApi.setRefreshToken(refreshToken);
-			// async () => {await getSavedTracks(spotifyApi).then(async data => {await writeFile("./public/songsData.json", JSON.stringify(data), 'utf8')});}
-
-			//se passa troppo tempo refresho il token
-			setInterval(async () => {
-				const data = await spotifyApi.refreshAccessToken();
-				accessToken = data.body['access_token'];
-
-				console.log('The access token has been refreshed!');
-				console.log('access_token:', accessToken);
-
-				spotifyApi.setAccessToken(accessToken);
-			}, expires_in / 2 * 1000);
-
 		})
 		.catch(error => {
 			console.error('Error getting Tokens:', error);
